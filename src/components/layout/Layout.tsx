@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import AdminFloatButton from "./AdminFloatButton";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <AdminFloatButton />
     </div>
   );
 }
