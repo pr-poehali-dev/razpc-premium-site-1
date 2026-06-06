@@ -8,14 +8,16 @@ export const IMAGES = {
   workstation: "https://cdn.poehali.dev/projects/8698a5c8-0a14-474b-8bf4-5ba496d8e69a/files/f83a4ef9-27b4-426f-b819-2dc0b4d259b1.jpg",
 };
 
-async function apiFetch(path: string, options?: RequestInit) {
-  const res = await fetch(`${API_URL}${path}`, options);
+async function apiFetch(params: Record<string, string>, options?: RequestInit) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(`${API_URL}?${qs}`, options);
   if (!res.ok) throw new Error(`API error ${res.status}`);
   return res.json();
 }
 
-async function adminFetch(path: string, token: string, options?: RequestInit) {
-  const res = await fetch(`${ADMIN_API_URL}${path}`, {
+async function adminFetch(params: Record<string, string>, token: string, options?: RequestInit) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(`${ADMIN_API_URL}?${qs}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -29,24 +31,24 @@ async function adminFetch(path: string, token: string, options?: RequestInit) {
 
 export const api = {
   getProducts: (category?: string, featured?: boolean) => {
-    const params = new URLSearchParams();
-    if (category) params.set("category", category);
-    if (featured) params.set("featured", "true");
-    return apiFetch(`/products?${params}`);
+    const p: Record<string, string> = { action: "products" };
+    if (category) p.category = category;
+    if (featured) p.featured = "true";
+    return apiFetch(p);
   },
-  getProduct: (slug: string) => apiFetch(`/products/${slug}`),
-  getCategories: () => apiFetch("/categories"),
-  getServices: () => apiFetch("/services"),
-  getPortfolio: () => apiFetch("/portfolio"),
-  getReviews: (featured?: boolean) => apiFetch(`/reviews${featured ? "?featured=true" : ""}`),
-  getContent: () => apiFetch("/content"),
-  getArticles: () => apiFetch("/articles"),
-  getArticle: (slug: string) => apiFetch(`/articles/${slug}`),
+  getProduct: (slug: string) => apiFetch({ action: "product", slug }),
+  getCategories: () => apiFetch({ action: "categories" }),
+  getServices: () => apiFetch({ action: "services" }),
+  getPortfolio: () => apiFetch({ action: "portfolio" }),
+  getReviews: (featured?: boolean) => apiFetch(featured ? { action: "reviews", featured: "true" } : { action: "reviews" }),
+  getContent: () => apiFetch({ action: "content" }),
+  getArticles: () => apiFetch({ action: "articles" }),
+  getArticle: (slug: string) => apiFetch({ action: "article", slug }),
   submitOrder: (data: {
     name: string; phone?: string; email?: string;
     message?: string; service?: string; product_id?: number;
     product_name?: string; source?: string;
-  }) => apiFetch("/orders", {
+  }) => apiFetch({ action: "order" }, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -54,45 +56,45 @@ export const api = {
 };
 
 export const adminApi = {
-  getOrders: (token: string) => adminFetch("/admin/orders", token),
+  getOrders: (token: string) => adminFetch({ action: "orders" }, token),
   updateOrder: (token: string, id: number, data: object) =>
-    adminFetch(`/admin/orders/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "orders", id: String(id) }, token, { method: "PUT", body: JSON.stringify(data) }),
 
-  getProducts: (token: string) => adminFetch("/admin/products", token),
+  getProducts: (token: string) => adminFetch({ action: "products" }, token),
   createProduct: (token: string, data: object) =>
-    adminFetch("/admin/products", token, { method: "POST", body: JSON.stringify(data) }),
+    adminFetch({ action: "products" }, token, { method: "POST", body: JSON.stringify(data) }),
   updateProduct: (token: string, id: number, data: object) =>
-    adminFetch(`/admin/products/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "products", id: String(id) }, token, { method: "PUT", body: JSON.stringify(data) }),
   deleteProduct: (token: string, id: number) =>
-    adminFetch(`/admin/products/${id}`, token, { method: "DELETE" }),
+    adminFetch({ action: "products", id: String(id) }, token, { method: "DELETE" }),
 
-  getServices: (token: string) => adminFetch("/admin/services", token),
+  getServices: (token: string) => adminFetch({ action: "services" }, token),
   updateService: (token: string, id: number, data: object) =>
-    adminFetch(`/admin/services/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "services", id: String(id) }, token, { method: "PUT", body: JSON.stringify(data) }),
 
-  getPortfolio: (token: string) => adminFetch("/admin/portfolio", token),
+  getPortfolio: (token: string) => adminFetch({ action: "portfolio" }, token),
   createPortfolio: (token: string, data: object) =>
-    adminFetch("/admin/portfolio", token, { method: "POST", body: JSON.stringify(data) }),
+    adminFetch({ action: "portfolio" }, token, { method: "POST", body: JSON.stringify(data) }),
   updatePortfolio: (token: string, id: number, data: object) =>
-    adminFetch(`/admin/portfolio/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "portfolio", id: String(id) }, token, { method: "PUT", body: JSON.stringify(data) }),
   deletePortfolio: (token: string, id: number) =>
-    adminFetch(`/admin/portfolio/${id}`, token, { method: "DELETE" }),
+    adminFetch({ action: "portfolio", id: String(id) }, token, { method: "DELETE" }),
 
-  getReviews: (token: string) => adminFetch("/admin/reviews", token),
+  getReviews: (token: string) => adminFetch({ action: "reviews" }, token),
   createReview: (token: string, data: object) =>
-    adminFetch("/admin/reviews", token, { method: "POST", body: JSON.stringify(data) }),
+    adminFetch({ action: "reviews" }, token, { method: "POST", body: JSON.stringify(data) }),
   updateReview: (token: string, id: number, data: object) =>
-    adminFetch(`/admin/reviews/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "reviews", id: String(id) }, token, { method: "PUT", body: JSON.stringify(data) }),
   deleteReview: (token: string, id: number) =>
-    adminFetch(`/admin/reviews/${id}`, token, { method: "DELETE" }),
+    adminFetch({ action: "reviews", id: String(id) }, token, { method: "DELETE" }),
 
-  getContent: (token: string) => adminFetch("/admin/content", token),
+  getContent: (token: string) => adminFetch({ action: "content" }, token),
   updateContent: (token: string, data: object) =>
-    adminFetch("/admin/content", token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "content" }, token, { method: "PUT", body: JSON.stringify(data) }),
 
-  getArticles: (token: string) => adminFetch("/admin/articles", token),
+  getArticles: (token: string) => adminFetch({ action: "articles" }, token),
   createArticle: (token: string, data: object) =>
-    adminFetch("/admin/articles", token, { method: "POST", body: JSON.stringify(data) }),
+    adminFetch({ action: "articles" }, token, { method: "POST", body: JSON.stringify(data) }),
   updateArticle: (token: string, id: number, data: object) =>
-    adminFetch(`/admin/articles/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+    adminFetch({ action: "articles", id: String(id) }, token, { method: "PUT", body: JSON.stringify(data) }),
 };
