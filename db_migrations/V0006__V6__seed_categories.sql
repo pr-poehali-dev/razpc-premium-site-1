@@ -1,0 +1,1 @@
+INSERT INTO categories (name, slug, sort_order) VALUES ('Gaming', 'gaming', 1), ('Workstation', 'workstation', 2), ('Streaming', 'streaming', 3), ('Budget', 'budget', 4), ('Premium', 'premium', 5);
