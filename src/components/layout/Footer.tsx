@@ -136,9 +136,20 @@ export default function Footer() {
           <p className="text-xs font-montserrat" style={{ color: "var(--razpc-muted)" }}>
             © {new Date().getFullYear()} RazPC. Профессиональная сборка ПК в Краснодаре.
           </p>
-          <p className="text-xs font-montserrat" style={{ color: "var(--razpc-muted)" }}>
-            Сборка ПК · Апгрейд · Диагностика · Краснодар
-          </p>
+          <div className="flex items-center gap-5">
+            <p className="text-xs font-montserrat" style={{ color: "var(--razpc-muted)" }}>
+              Сборка ПК · Апгрейд · Диагностика · Краснодар
+            </p>
+            <Link
+              to="/admin"
+              className="text-[10px] font-montserrat transition-all duration-300"
+              style={{ color: "var(--razpc-muted)", opacity: 0.3 }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; (e.currentTarget as HTMLElement).style.color = "var(--razpc-yellow)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.3"; (e.currentTarget as HTMLElement).style.color = "var(--razpc-muted)"; }}
+            >
+              Управление сайтом
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
